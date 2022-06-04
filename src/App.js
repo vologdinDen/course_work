@@ -31,25 +31,11 @@ function App() {
   const [blobURL, setBlob] = useState('');
   const [audioFile, setAudioFile] = useState(null);
   const recoder = useRef(null);
-  
-  const [uploadURL, setUploadUrl] = useState("");
-  const [transcriptID, setTranscriptID] = useState("");
-  const [transcriptData, setTranscriptData] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   
   useEffect(() => {
     recoder.current = new MicRecorder({bitRate: 128});
   }, []);
-
-  useEffect(() => {
-    if(audioFile){
-      assembly
-       .post("/upload", audioFile)
-       .then((res) => setUploadUrl(res.data.upload_url))
-       .catch((err) => console.error(err));
-    }
-  }, [audioFile]);
 
   const startRecording = () => {
     recoder.current.start().then(() => {
@@ -77,6 +63,20 @@ function App() {
     submitTranscriptoinHandler();
   }
 
+  const [uploadURL, setUploadUrl] = useState("");
+  const [transcriptID, setTranscriptID] = useState("");
+  const [transcriptData, setTranscriptData] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if(audioFile){
+      assembly
+       .post("/upload", audioFile)
+       .then((res) => setUploadUrl(res.data.upload_url))
+       .catch((err) => console.error(err));
+    }
+  }, [audioFile]);
+
   const submitTranscriptoinHandler = () => {
     assembly
      .post("/transcript", {
@@ -102,17 +102,18 @@ function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (transcriptData.status !== "completed" && isLoading){
-        checkStatusHandler();
-      }else{
+      if (isLoading && transcriptData.status === "completed"){
         setIsLoading(false);
         setQuery(transcriptData.text);
 
         clearInterval(interval);
+      }else if (isLoading){
+        checkStatusHandler();
       }
     }, 1000)
     return () => clearInterval(interval);
-  }, [isLoading])
+  },)
+
   
   const getData = async () => {
     if(query !== ""){

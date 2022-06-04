@@ -112,7 +112,7 @@ function App() {
       }
     }, 1000)
     return () => clearInterval(interval);
-  }, )
+  }, [isLoading])
   
   const getData = async () => {
     if(query !== ""){
@@ -123,7 +123,9 @@ function App() {
       }
       
       setRecipes(result.data.hits);
-      setAlert("");    
+      console.log(query)
+      setAlert(""); 
+      setQuery("")   
     }else{
       setAlert("Please fill the form");
     }

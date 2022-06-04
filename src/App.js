@@ -11,7 +11,7 @@ import Alert from './components/Alert';
 const assembly = Axios.create({
   baseURL: "https://api.assemblyai.com/v2",
   headers: {
-    authorization: "ab85c326a72f4fdc827e60f4c918d857",
+    authorization: "bc2e12595152421988bfe9aca031abf4",
     "content-type": "application/json",
   },
 });
@@ -24,7 +24,7 @@ function App() {
   const [alert, setAlert] = useState("");
 
   const API_ID = "7fe28959";
-  const API_KEY = "04789bab3084162241b8549b937a3158";
+  const API_KEY = "0808e379aff35f5f0953944875d1b0d5";
   const url = `https://api.edamam.com/api/recipes/v2?type=public&q=${query}&app_id=${API_ID}&app_key=${API_KEY}`;
 
   const [isRecording, setIsRecording] = useState(false);

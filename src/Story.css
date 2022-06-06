@@ -1,0 +1,13 @@
+h2{
+    color: #40b48e;
+    font-style: italic;
+    text-align: center;
+}
+
+.story-zone{
+    display: flex;
+    flex-direction: column;
+    width: 50vw;
+    margin-top: 1vh;
+    border-top: 1vh;
+}

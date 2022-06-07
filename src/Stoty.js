@@ -14,7 +14,7 @@ function Story(){
         <div className="App">
             <h1>Recipe Search APP</h1>
             <h2>Click on the button to save the history to the clipboard</h2>
-            {localStorage.getItem("History") !== null ? (story.map((node, index) => (
+            {story !== null && story.length > 0 ? (story.map((node, index) => (
                 <li key={index}>
                 <div className="story-zone">
                    <Button type="button"  variant="success" size='lg' onClick={() => {navigator.clipboard.writeText(node)}}>

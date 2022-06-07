@@ -39,10 +39,10 @@ const Recipes = ({recipe}) => {
     return (
         <div className="recipe">
             <div className="recipe-head">
-            {!inFavorite ? (<Button type='button' variant="light" size="sm" onClick={addToFavorite}>
+            {!inFavorite ? (<Button className='mb-2' type='button' variant="light" size="sm" onClick={addToFavorite}>
                 <Star className="star-image"></Star>
             </Button>) : (
-                <Button type='button' variant="warning" size="sm" onClick={deleteFromFavorite}>
+                <Button className='mb-2' type='button' variant="warning" size="sm" onClick={deleteFromFavorite}>
                     <Star className="star-image"></Star>
                 </Button>
             )}

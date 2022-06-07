@@ -5,7 +5,7 @@ import MicRecorder from 'mic-recorder-to-mp3';
 
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Mic, MicMute } from 'react-bootstrap-icons';
+import { Mic, MicMute, Hourglass } from 'react-bootstrap-icons';
 
 import { Form, Button } from 'react-bootstrap';
 import Badge from 'react-bootstrap/Badge';
@@ -16,7 +16,7 @@ import Alert from './components/Alert';
 const assembly = Axios.create({
     baseURL: "https://api.assemblyai.com/v2",
     headers: {
-      authorization: "bc2e12595152421988bfe9aca031abf4",
+      authorization: "711f46c019f04ba8bf06ffd4f928abc7",
       "content-type": "application/json",
     },
   });
@@ -28,7 +28,7 @@ function Main() {
     const [alert, setAlert] = useState("");
   
     const API_ID = "7fe28959";
-    const API_KEY = "65a026ce71017d1616fae63b51dbecb145";
+    const API_KEY = "65a026ce71017d1616fae63b51dbecb1";
   
     const [isRecording, setIsRecording] = useState(false);
     const [blobURL, setBlob] = useState('');
@@ -44,9 +44,12 @@ function Main() {
     }, []);
 
     const startRecording = () => {
-        recoder.current.start().then(() => {
-          setIsRecording(true);
-        })
+      setUploadUrl("");
+      setAudioFile(null);
+      setTranscriptData("");
+      recoder.current.start().then(() => {
+        setIsRecording(true);
+      })
       }
     
       const stopRecording = () => {
@@ -63,6 +66,7 @@ function Main() {
            console.log(blobURL);
            setIsRecording(false);
            setAudioFile(file);
+           setIsLoading(true);
          })
          .catch((e) => console.log(e));    
       }
@@ -94,7 +98,8 @@ function Main() {
       }
     
       useEffect(() => {
-        if(uploadURL){
+        if(uploadURL){   
+                 
           assembly.post("/transcript", {
           audio_url: uploadURL,
           })
@@ -106,17 +111,20 @@ function Main() {
       }, [uploadURL])
     
       useEffect(() => {
-        const interval = setInterval(() => {
-          if (isLoading && transcriptData.status === "completed"){
-            setIsLoading(false);
-            setQuery(transcriptData.text);
-    
-            clearInterval(interval);
-          }else if (isLoading){
-            checkStatusHandler();
-          }
-        }, 1000)
-        return () => clearInterval(interval);
+        if(isLoading){
+          const interval = setInterval(() => {
+            if (transcriptData.status === "completed"){
+              setIsLoading(false);
+              setQuery(transcriptData.text);
+      
+
+              clearInterval(interval);
+            }else{
+              checkStatusHandler();
+            }
+          }, 1000)
+          return () => clearInterval(interval);
+        }
       },)
     
       
@@ -126,9 +134,17 @@ function Main() {
           const result = await Axios.get(url);
           
           if(result.data.to === 0){
+            setIsSearch(false);
+            
             return setAlert("No ingredients with such name");
           }
-          console.log(result.data.hits[0]._links.self.href);
+          setChipsArray(existingItems => {return[...existingItems.concat(query.split(/[\s,]+/))]});
+          const previos = JSON.parse(localStorage.getItem("History"));
+          if(previos !== null){
+              localStorage.setItem("History", JSON.stringify([...previos, query + " " + chipsArray.join(" ")]))
+          }else{
+              localStorage.setItem("History", JSON.stringify([query + " " + chipsArray.join(" ")]))
+          }
           setRecipes(result.data.hits);
           setAlert("");
           setQuery(""); 
@@ -146,13 +162,6 @@ function Main() {
       const onSubmit = e => {
         setIsSearch(true);
         e.preventDefault();
-        setChipsArray(existingItems => {return[...existingItems.concat(query.split(/[\s,]+/))]});
-        const previos = JSON.parse(localStorage.getItem("History"));
-        if(previos !== null){
-            localStorage.setItem("History", JSON.stringify([...previos, query + " " + chipsArray.join(" ")]))
-        }else{
-            localStorage.setItem("History", JSON.stringify([query + " " + chipsArray.join(" ")]))
-        }
         getData();
       }
     
@@ -181,8 +190,8 @@ function Main() {
           </Form>
   
           {!isRecording ? (
-            <Button type="button" variant='ligth' onClick={startRecording}>
-              <MicMute className='micro-image'/>
+            <Button type="button" variant='ligth' onClick={!isLoading ? startRecording : null}>
+              {!isLoading ? <MicMute className='micro-image'/> : <Hourglass className='hourglass-image'/>}
             </Button>
           ) : (
             <Button type="button" variant='ligth' onClick={stopRecording}>
